@@ -194,3 +194,11 @@ a:hover {
     margin-left: 10px;
     margin-right: 45px;
 }
+
+.expert{
+    color: #008000;
+}
+
+.learner{
+    color: #F79646;
+}
