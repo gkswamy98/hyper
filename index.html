@@ -84,7 +84,7 @@
       <br /><br />
 
       <div class="author">
-        <a href="https://jren03.github.io/>Juntao Ren</a><sup>*, 2</sup>
+        <a href="https://jren03.github.io/">Juntao Ren</a><sup>*, 2</sup>
       </div>
       <div class="author">
         <a href="https://gokul.dev/">Gokul Swamy</a><sup>*, 1</sup>
@@ -95,11 +95,11 @@
       <div class="author">
         <a href="https://www.ri.cmu.edu/ri-people/j-andrew-drew-bagnell/"
           >Drew Bagnell</a
-        ><sup>3, 1</sup>
+        ><sup>1, 3</sup>
       </div>
       <div class="author">
         <a href="http://www.sanjibanchoudhury.com/">Sanjiban Choudhury</a
-        ><sup>2</sup>
+        ><sup>2, 3</sup>
       </div>
 
       <br /><br />
@@ -144,7 +144,7 @@
       <br /><br />
 
       <img
-        style="width: 60%;"
+        style="width: 50%;"
         src="./resources/hyper_ffig.svg"
         alt="Teaser figure."
       />
@@ -206,50 +206,53 @@
 
       <h1>Key Insights</h1>
 
-      <h2>1. Reducing inverse RL to expert-competitive RL</h2>
+      <h2>1. Inverse IRL is Inefficient Due to RL</h2>
       <p style="width: 80%;">
-        Traditional inverse RL is formulated as two-player game with an
-        adversarial discriminator that select reward function in the outer loop,
-        and a learner that optimizes this reward function via reinforcement
-        learning in the inner loop. The learner will have discovered a good
-        enough policy if, for any reward function chosen by the adversary, it
-        performs as well as the expert. However, typical online RL algorithms
-        used in this inner loop sees the learner spending the majority of
-        interactions trying out policies that are quite dissimilar to the
-        expert’s in the hope of finding a bit of reward. Visually,
+        Traditional inverse RL (IRL) is formulated as two-player game with an
+        adversary selecting a reward function in the outer loop, and a learner
+        that optimizes this reward function <b><i>to completion</i></b> via
+        reinforcement learning in the inner loop. Thus, the majority of time in
+        IRL is spent in this inner loop searching over policies. However,
+        because the expert doesn't need to be the optimal policy under the
+        adversarially chosen reward, this can lead to a lot of wasted
+        computation, as shown in the two trees below:
       </p>
       <img style="width: 60%" src="./resources/ecr.svg" />
       <br />
       <br />
       <p style="width: 80%;">
-        note in the above tree MDP that the
+        Note in the above tree MDP that the
         <span class="expert">expert</span> is not optimal under reward $f_1$ or
-        $f_2$. However, the <span class="learner">learner </span> still searches
-        through the entire tree to find the <i>best</i> policy under the
-        proposed reward function. Given our goal is merely to imitate the
-        expert, this search procedure is needlessly expensive. Further, because
-        the <i>best-response</i> policy can vary wildly across iterations, this
-        can introduce instability into the training process. Instead, one might
-        hope that as long as the learner can consistently compete with the
-        <i>expert</i> under whatever metric the adversary chooses, we should be
-        able to guarantee that we compete with the expert under the ground-truth
-        reward.
+        $f_2$. Nevertheless, in computing the <i>best response</i> to the reward
+        chosen in the outer loop, the <span class="learner">learner</span> needs
+        to pay for the worst-case exploration complexity of RL &#8212;
+        $O(\exp(H))$. Given our goal is merely to imitate the expert, this
+        search procedure is needlessly expensive. Furthermore, given the
+        best-response can change widely across iterations, this sort of
+        procedure can introduce instability into the training process. The same
+        set of concerns apply to algorithms that take a small no-regret step
+        (e.g. GAIL) at each inner loop iteration: they need to explore the
+        entire MDP at least once.
       </p>
 
-      <h2>2. Formalizing the intuition</h2>
+      <h2>2. Reducing Inverse RL to Expert Competitive RL</h2>
       <p style="width: 80%;">
-        Suppose we have a <i>no-regret</i> reward selection algorithm
-        $\mathbb{A}_{f}$ which produces iterates $f_{t+1} =
-        \mathbb{A}_f(\ell_{1:t})$, where $\ell_t(f) = \frac{1}{H}\left( J(\pi_t,
-        f) - J(\pi_E, f) \right)$, such that $$\sum_{t=1}^T \ell_t(f_t) -
-        \min_{f^{\star} \in \mathit{F}_r} \sum_{t=1}^T \ell_t(f^{\star}) \leq
-        \mathsf{Reg}_f(T),$$ with $\lim_{t \to \infty}
-        \frac{\mathsf{Reg}_f(T)}{T} = 0$. Now, given some policy-selection
-        algorithm $\mathbb{A}_{\pi}$ which produces a sequence of policies
-        $\pi_{t+1} = \mathbb{A}_{\pi}(f_{1:t})$ for any sequence of reward
-        functions $f_{1:t}$, we say the algorithm satisfies the
-        $\mathsf{Reg}_{\pi}(T)$ expert-relative regret guarantee if
-        $$\sum_{t=1}^T J(\pi_E, f_t) - J(\pi_t, f_t) \leq
+        Recall that at heart, what we care about in IRL is competing with the
+        expert. Thus, intuitively, as long as we can consistently compete with
+        the expert in the inner loop &#8212; i.e. via an
+        <i>expert-competitive response</i> rather than a best-response &#8212;
+        we might hope that we can derive algorithms with strong performance
+        guarantees. We can now formalize this intuition via a simple proof. We
+        first define an <b>Expert Relative Regret Oracle</b> (ERROr). In words,
+        this equation tells us that no matter what sequence of reward functions
+        we face, on average, we perform almost as well as the expert.
+      </p>
+      <p style="width: 80%;">
+        Suppose we have some policy-selection algorithm $\mathbb{A}_{\pi}$ which
+        produces a sequence of policies $\pi_{t+1} = \mathbb{A}_{\pi}(f_{1:t})$
+        for any sequence of reward functions $f_{1:t}$, we say the algorithm
+        satisfies the $\mathsf{Reg}_{\pi}(T)$ expert-relative regret guarantee
+        if $$\sum_{t=1}^T J(\pi_E, f_t) - J(\pi_t, f_t) \leq
         \mathsf{Reg}_{\pi}(T).$$ Then $\bar{\pi}$ (the mixture of $\pi_{1:T}$)
         satisfies $$\begin{aligned}J(\pi_E, r) - J(\bar{\pi}, r) &= \frac{1}{T}
         \sum_{t=1}^T J(\pi_E, r) - J(\pi_t, r) \\ &\leq \max_{f^{\star} \in
@@ -257,20 +260,27 @@
         f^{\star}) \\ &\leq \frac{1}{T} \sum_{t=1}^T J(\pi_E, f_t) - J(\pi_t,
         f_t) + \frac{\mathsf{Reg}_f(T)}{T}H \\ &\leq
         \frac{\mathsf{Reg}_{\pi}(T)}{T} + \frac{\mathsf{Reg}_f(T)}{T}
-        H.\end{aligned}$$ Since $\mathbb{A}_f$ is no-regret, the second term
-        goes to 0 as $T \to \infty$, meaning we only need to compete with the
-        expert on average to ensure we learn a policy with strong performance.
+        H.\end{aligned}$$ If we use a no-regret reward selection algorithm such
+        as online gradient descent, the second term goes to 0 as $T \to \infty$.
+        Therefore, we only need to compete with the expert on average to ensure
+        we learn a policy with strong performance.
       </p>
 
-      <h2>3. Practical Procedure</h2>
+      <h2>3. Using Hybrid RL to Perform ECRs</h2>
       <p style="width: 80%;">
-        To this end, we provide a general framework that allows us to lift any
-        off-the-shelf RL algorithm that guarantees competing with the expert to
-        the space of inverse RL and inherit the performance guarantees therein.
-        We derive two inverse RL algorithms with strong performance guarantees
-        using this framework: a model-free variant named
-        <code>HyPE</code> (Hybrid Policy Emulation) and a model-based variant
-        named <code>HyPER</code> (Hybrid Policy Emulation with Resets).
+        By leveraging prior algorihms in <i><b>hyrbid RL</b></i> (<a
+          href="https://arxiv.org/abs/1203.1007"
+          >Ross and Bagnell (2012)</a
+        >, <a href="https://arxiv.org/abs/2210.06718">Song et al. (2023)</a>,
+        <a href="https://proceedings.mlr.press/v202/vemula23a.html"
+          >Vemula et al. (2023)</a
+        >) that satisfy the ERROr property in the inner RL loop, we can
+        efficiently find strong policies without reward information. In
+        particular, we derive two <i><b>hybrid</b></i> inverse RL algorithms
+        with strong performance guarantees using this framework: a model-free
+        variant named <code>HyPE</code> (Hybrid Policy Emulation) and a
+        model-based variant named <code>HyPER</code> (Hybrid Policy Emulation
+        with Resets).
       </p>
 
       <p style="width: 80%">
@@ -286,8 +296,7 @@
             rollouts.
           </li>
           <li>
-            Update the policy (and critic network if using off-policy RL) using
-            a mixture of samples from both buffers.
+            Run your on/off-policy RL algorithm on the mixture of these buffers.
           </li>
         </ol>
       </div>
@@ -297,27 +306,25 @@
         algorithm from
         <a href="https://proceedings.mlr.press/v202/vemula23a.html"
           >Vemula et al. (2023)</a
-        >
-        as follows:
+        >. We note that <code>HyPER</code> is equivalent to running the
+        <a href="https://gokul.dev/filter/">FILTER</a>
+        algorithm as follows:
       </p>
       <div style="display: flex; justify-content: center;">
         <ol style="width: 70%; text-align: left;">
           <li>
-            Maintain separate buffers for expert samples, policy rollouts, and
-            model rollouts.
+            Rollout the policy in the real world.
           </li>
           <li>
-            Update the model using a mixture of samples from expert and policy
-            buffers.
+            Update the model on a mixture of learner and expert data.
           </li>
           <li>
-            Reset the agent to a mixture of expert and policy states within the
-            model.
+            Run some RL algorithm <i>inside</i> the model, resetting to states
+            from the expert demonstrations to reduce exploration and model
+            exploitation.
           </li>
-          <li>Update networks on rollout states within the model.</li>
         </ol>
       </div>
-
       <h2>4. Empirical Benchmark</h2>
       <p style="width: 80%">
         We benchmark <code>HyPE</code> and <code>HyPER</code> against other
@@ -325,7 +332,7 @@
         Notably, <i>neither</i> of our algorithms require the ability to reset
         to specific states within the environment. To the best of our knowledge,
         this is the highest performance achieved by an inverse RL algorithm on
-        the <code>antmaze</code>, including those that require generative model
+        <code>antmaze</code>, including those that require generative model
         access to the environment.
       </p>
       <img style="width: 60%" src="./resources/maze_shared.svg" />
@@ -355,8 +362,8 @@
       <div class="paper-info">
         <h3>Hyrbid Inverse Reinforcement Learning</h3>
         <p>
-          Juntao Ren<sup>*</sup>, Gokul Swamy<sup>*</sup>, J. Andrew Bagnell,
-          Zhiwei Steven Wu, Sanjiban Choudhury
+          Juntao Ren<sup>*</sup>, Gokul Swamy<sup>*</sup>, Zhiwei Steven Wu, J.
+          Andrew Bagnell, Sanjiban Choudhury
         </p>
         <pre><code>@misc{ren2024hybrid,
     title = {Hybrid Inverse Reinforcement Learning},
