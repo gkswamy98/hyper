@@ -94,7 +94,7 @@
       </div>
       <br />
       <div class="author">
-        <a href="https://www.ri.cmu.edu/ri-people/j-andrew-drew-bagnell/"
+        <a href="https://www.ri.cmu.edu/ri-faculty/j-andrew-drew-bagnell/"
           >Drew Bagnell</a
         ><sup>1, 3</sup>
       </div>
@@ -109,6 +109,9 @@
       <div class="affiliation"><sup>2&nbsp;</sup>Cornell University</div>
       <div class="affiliation"><sup>3&nbsp;</sup>Aurora Innovation</div>
 
+      <br />
+      <div class="footnote"><sup>*</sup>Indicates equal contribution.</div>
+
       <br /><br />
 
       <div class="links">
@@ -121,17 +124,18 @@
           ><br />[Paper]</a
         >
       </div>
-      <!-- TODO -->
-      <!-- <div class="links">
-        <a href="https://youtu.be/UATgep5bT8s"
+
+      <div class="links">
+        <a
+          href="https://youtu.be/zdbhPZ0Epow?si=QGXpMtNJ5O1pmg3h?start=5:30&end=38:30"
           ><i
             class="fa fa-play-circle"
             style="font-size: 50px; padding-bottom: 10px"
           ></i
           ><br />[Video]</a
         >
-      </div> -->
-      <!-- TODO -->
+      </div>
+
       <div class="links">
         <a href="https://github.com/jren03/garage/tree/main"
           ><i
@@ -166,7 +170,7 @@
         The inverse reinforcement learning approach to imitation learning is a
         double-edged sword. On the one hand, it can enable learning from a
         smaller number of expert demonstrations with more robustness to error
-        compounding than Behavioral Cloning approaches. On the other hand, it
+        compounding than behavioral cloning approaches. On the other hand, it
         requires that the learner repeatedly solve a computationally expensive
         reinforcement learning (RL) problem. Often, much of this computation is
         wasted searching over policies very dissimilar to the expert's. In this
@@ -189,18 +193,17 @@
       </p>
       <br />
 
-      <!-- TODO -->
-      <!-- <hr /> -->
-      <!-- <h1>Video</h1>
+      <hr />
+      <h1>Video</h1>
       <div class="video-container">
         <iframe
-          src="https://www.youtube.com/embed/UATgep5bT8s"
+          src="https://youtu.be/zdbhPZ0Epow?si=QGXpMtNJ5O1pmg3h?start=5:30&end=38:30"
           frameborder="0"
           allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen
         ></iframe>
-      </div> -->
-      <!-- TODO -->
+      </div>
+
       <br />
 
       <hr />
@@ -209,7 +212,7 @@
 
       <h2>1. Inverse IRL is Inefficient Due to RL</h2>
       <p style="width: 80%;">
-        Traditional inverse RL (IRL) is formulated as two-player game with an
+        Traditional inverse RL (IRL) is formulated as a two-player game with an
         adversary selecting a reward function in the outer loop, and a learner
         that optimizes this reward function <b><i>to completion</i></b> via
         reinforcement learning in the inner loop. Thus, the majority of time in
@@ -244,9 +247,7 @@
         <i>expert-competitive response</i> rather than a best-response &#8212;
         we might hope that we can derive algorithms with strong performance
         guarantees. We can now formalize this intuition via a simple proof. We
-        first define an <b>Expert Relative Regret Oracle</b> (ERROr). In words,
-        this equation tells us that no matter what sequence of reward functions
-        we face, on average, we perform almost as well as the expert.
+        first define an <b>Expert Relative Regret Oracle</b> (ERROr).
       </p>
       <p style="width: 80%;">
         Suppose we have some policy-selection algorithm $\mathbb{A}_{\pi}$ which
@@ -254,8 +255,17 @@
         for any sequence of reward functions $f_{1:t}$, we say the algorithm
         satisfies the $\mathsf{Reg}_{\pi}(T)$ expert-relative regret guarantee
         if $$\sum_{t=1}^T J(\pi_E, f_t) - J(\pi_t, f_t) \leq
-        \mathsf{Reg}_{\pi}(T).$$ Then $\bar{\pi}$ (the mixture of $\pi_{1:T}$)
-        satisfies $$\begin{aligned}J(\pi_E, r) - J(\bar{\pi}, r) &= \frac{1}{T}
+        \mathsf{Reg}_{\pi}(T).$$ In words, this equation tells us that no matter
+        what sequence of reward functions we face, on average, we perform almost
+        as well as the expert. If you have an RL Theory background, this sort of
+        <i>performance difference</i> should set of your spidey senses: most RL
+        algorithms operate by minimizing upper bounds of it. We'll go through
+        some examples of such algorithms in a bit but first, let us see how we
+        can use an ERROr algorithm inside IRL. Let's assume we pick a sequence
+        of reward functions $f_{1:T}$ via training a discriminator between
+        learner and expert data. Then, via the ERROr property, we have that
+        $\bar{\pi}$ (the mixture of $\pi_{1:T}$) satisfies
+        $$\begin{aligned}J(\pi_E, r) - J(\bar{\pi}, r) &= \frac{1}{T}
         \sum_{t=1}^T J(\pi_E, r) - J(\pi_t, r) \\ &\leq \max_{f^{\star} \in
         \mathit{F}_r} \frac{1}{T} \sum_{t=1}^T J(\pi_E, f^{\star}) - J(\pi_t,
         f^{\star}) \\ &\leq \frac{1}{T} \sum_{t=1}^T J(\pi_E, f_t) - J(\pi_t,
@@ -263,13 +273,16 @@
         \frac{\mathsf{Reg}_{\pi}(T)}{T} + \frac{\mathsf{Reg}_f(T)}{T}
         H.\end{aligned}$$ If we use a no-regret reward selection algorithm such
         as online gradient descent, the second term goes to 0 as $T \to \infty$.
-        Therefore, we only need to compete with the expert on average to ensure
-        we learn a policy with strong performance.
+        In short,
+        <i
+          >we only need to compete with the expert on average to ensure we learn
+          a policy with strong performance.</i
+        >
       </p>
 
       <h2>3. Using Hybrid RL to Perform ECRs</h2>
       <p style="width: 80%;">
-        By leveraging prior algorihms in <i><b>hyrbid RL</b></i> (<a
+        By leveraging prior algorithms in <i><b>hybrid RL</b></i> (<a
           href="https://arxiv.org/abs/1203.1007"
           >Ross and Bagnell (2012)</a
         >, <a href="https://arxiv.org/abs/2210.06718">Song et al. (2023)</a>,
@@ -330,7 +343,7 @@
       <p style="width: 80%">
         We benchmark <code>HyPE</code> and <code>HyPER</code> against other
         inverse RL baselines on locomotion tasks from D4RL and the MuJoCo suite.
-        Notably, <i>neither</i> of our algorithms require the ability to reset
+        Notably, <i>neither</i> of our algorithms requires the ability to reset
         to specific states within the environment. To the best of our knowledge,
         this is the highest performance achieved by an inverse RL algorithm on
         <code>antmaze</code>, including those that require generative model
