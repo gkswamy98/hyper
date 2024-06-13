@@ -214,10 +214,10 @@
         Traditional inverse RL (IRL) is formulated as a two-player game with an
         adversary selecting a reward function in the outer loop, and a learner
         that optimizes this reward function <b><i>to completion</i></b> via
-        reinforcement learning in the inner loop. Thus, the majority of time in
-        IRL is spent in this inner loop searching over policies. However,
-        because the expert doesn't need to be the optimal policy under the
-        adversarially chosen reward, this can lead to a lot of wasted
+        reinforcement learning in the inner loop. Consequently, the majority of
+        time in IRL is spent in this inner loop searching over policies.
+        However, because the expert doesn't need to be the optimal policy under
+        the adversarially chosen reward, this can lead to a lot of wasted
         computation, as shown in the two trees below:
       </p>
       <img style="width: 60%" src="./resources/ecr.svg" />
@@ -251,7 +251,7 @@
       <p style="width: 80%;">
         Suppose we have some policy-selection algorithm $\mathbb{A}_{\pi}$ which
         produces a sequence of policies $\pi_{t+1} = \mathbb{A}_{\pi}(f_{1:t})$
-        for any sequence of reward functions $f_{1:t}$, we say the algorithm
+        for any sequence of reward functions $f_{1:t}$. We say the algorithm
         satisfies the $\mathsf{Reg}_{\pi}(T)$ expert-relative regret guarantee
         if $$\sum_{t=1}^T J(\pi_E, f_t) - J(\pi_t, f_t) \leq
         \mathsf{Reg}_{\pi}(T).$$ In words, this equation tells us that no matter
@@ -321,7 +321,7 @@
           >Vemula et al. (2023)</a
         >. We note that <code>HyPER</code> is equivalent to running the
         <a href="https://gokul.dev/filter/">FILTER</a>
-        algorithm as follows:
+        algorithm inside a model fit on hybrid data, as follows:
       </p>
       <div style="display: flex; justify-content: center;">
         <ol style="width: 70%; text-align: left;">
