@@ -212,7 +212,7 @@
       <p style="width: 80%;">
         Note that in the above tree MDPs, the
         <span class="expert">expert</span> is not optimal under reward $f_1$ or
-        $f_2$. Nevertheless, in computing the <i>best response</i> to the reward
+        $f_2$. Nevertheless, in computing the <i>best-response</i> to the reward
         chosen in the outer loop (i.e. the corresponding optimal policy), the
         <span class="learner">learner</span> needs to pay for the worst-case
         exploration complexity of RL &#8212; $O(\exp(H))$. Given our goal is
@@ -326,9 +326,9 @@
       <p style="width: 80%">
         We note that <code>HyPER</code> is equivalent to running the
         <a href="https://gokul.dev/filter/">FILTER</a>
-        algorithm inside a model fit on hybrid data
+        algorithm inside a model fit on hybrid data.
       </p>
-      <h2>4. Empirical Benchmark</h2>
+      <h2>4. Empirical Results</h2>
       <p style="width: 80%">
         We benchmark <code>HyPE</code> and <code>HyPER</code> against other
         inverse RL baselines on locomotion tasks from D4RL and the MuJoCo suite.
