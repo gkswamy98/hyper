@@ -126,7 +126,7 @@
       </div>
 
       <div class="links">
-        <a href="https://www.youtube.com/zdbhPZ0Epow?start=317&end=2295"
+        <a href="https://www.youtube.com/watch?v=zdbhPZ0Epow&t=317s"
           ><i
             class="fa fa-play-circle"
             style="font-size: 50px; padding-bottom: 10px"
@@ -191,20 +191,6 @@
         control tasks.
       </p>
       <br />
-
-      <hr />
-      <h1>Video</h1>
-      <div class="video-container">
-        <iframe
-          src="https://www.youtube.com/embed/zdbhPZ0Epow?start=317&end=2295"
-          frameborder="0"
-          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen
-        ></iframe>
-      </div>
-
-      <br />
-
       <hr />
 
       <h1>Key Insights</h1>
@@ -224,18 +210,18 @@
       <br />
       <br />
       <p style="width: 80%;">
-        Note in the above tree MDP that the
+        Note that in the above tree MDPs, the
         <span class="expert">expert</span> is not optimal under reward $f_1$ or
         $f_2$. Nevertheless, in computing the <i>best response</i> to the reward
-        chosen in the outer loop, the <span class="learner">learner</span> needs
-        to pay for the worst-case exploration complexity of RL &#8212;
-        $O(\exp(H))$. Given our goal is merely to imitate the expert, this
-        search procedure is needlessly expensive. Furthermore, given the
-        best-response can change widely across iterations, this sort of
-        procedure can introduce instability into the training process. The same
-        set of concerns apply to algorithms that take a small no-regret step
-        (e.g. GAIL) at each inner loop iteration: they need to explore the
-        entire MDP at least once.
+        chosen in the outer loop (i.e. the corresponding optimal policy), the
+        <span class="learner">learner</span> needs to pay for the worst-case
+        exploration complexity of RL &#8212; $O(\exp(H))$. Given our goal is
+        merely to imitate the expert, this search procedure is needlessly
+        expensive. Furthermore, given the best-response can change widely across
+        iterations, this sort of procedure can introduce instability into the
+        training process. The same set of concerns apply to algorithms that take
+        a small no-regret step (e.g. GAIL) at each inner loop iteration: they
+        need to explore the entire MDP at least once.
       </p>
 
       <h2>2. Reducing Inverse RL to Expert Competitive RL</h2>
@@ -257,7 +243,7 @@
         \mathsf{Reg}_{\pi}(T).$$ In words, this equation tells us that no matter
         what sequence of reward functions we face, on average, we perform almost
         as well as the expert. If you have an RL Theory background, this sort of
-        <i>performance difference</i> should set of your spidey senses: most RL
+        <i>performance difference</i> should set off your spidey senses: most RL
         algorithms operate by minimizing upper bounds of it. We'll go through
         some examples of such algorithms in a bit but first, let us see how we
         can use an ERROr algorithm inside IRL. Let's assume we pick a sequence
@@ -275,7 +261,7 @@
         In short,
         <i
           >we only need to compete with the expert on average to ensure we learn
-          a policy with strong performance.</i
+          a strong policy.</i
         >
       </p>
 
@@ -319,9 +305,8 @@
         algorithm from
         <a href="https://proceedings.mlr.press/v202/vemula23a.html"
           >Vemula et al. (2023)</a
-        >. We note that <code>HyPER</code> is equivalent to running the
-        <a href="https://gokul.dev/filter/">FILTER</a>
-        algorithm inside a model fit on hybrid data, as follows:
+        >
+        as follows:
       </p>
       <div style="display: flex; justify-content: center;">
         <ol style="width: 70%; text-align: left;">
@@ -338,15 +323,20 @@
           </li>
         </ol>
       </div>
+      <p style="width: 80%">
+        We note that <code>HyPER</code> is equivalent to running the
+        <a href="https://gokul.dev/filter/">FILTER</a>
+        algorithm inside a model fit on hybrid data
+      </p>
       <h2>4. Empirical Benchmark</h2>
       <p style="width: 80%">
         We benchmark <code>HyPE</code> and <code>HyPER</code> against other
         inverse RL baselines on locomotion tasks from D4RL and the MuJoCo suite.
         Notably, <i>neither</i> of our algorithms requires the ability to reset
         to specific states within the environment. To the best of our knowledge,
-        this is the highest performance achieved by an inverse RL algorithm on
-        <code>antmaze</code>, including those that require generative model
-        access to the environment.
+        this is the highest performance achieved by any algorithm that does not
+        assume access to reward information on <code>antmaze</code>, including
+        those that require generative model access to the environment.
       </p>
       <img style="width: 60%" src="./resources/maze_shared.svg" />
       <p style="width: 80%">
@@ -359,6 +349,18 @@
         ></i
         ><br />[Code]</a
       >
+
+      <hr />
+      <h1>Video</h1>
+      <div class="video-container">
+        <iframe
+          src="https://www.youtube.com/embed/zdbhPZ0Epow?start=317&end=2295"
+          frameborder="0"
+          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+      <br />
       <hr />
 
       <h1>Paper</h1>
